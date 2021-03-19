@@ -70,3 +70,5 @@ build/
 # JetBrains IDE
 .idea/
 
+# Graph Network codegen
+generated/
