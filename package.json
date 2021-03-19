@@ -2,6 +2,8 @@
   "name": "simian-subgraph",
   "license": "MIT",
   "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ simian-finance/simian-subgraph",
@@ -11,6 +13,7 @@
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.20.0",
-    "@graphprotocol/graph-ts": "0.20.0"
+    "@graphprotocol/graph-ts": "0.20.0",
+    "truffle": "^5.2.4"
   }
 }

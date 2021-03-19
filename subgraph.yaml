@@ -1,4 +1,6 @@
 specVersion: 0.0.2
+description: Simian.Finance on Ethereum
+repository: https://github.com/simian-finance/simian-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -6,8 +8,9 @@ dataSources:
     name: SimianToken
     network: mainnet
     source:
-      address: "0x2B56e5C9D8a71F16B90554b0ab0db6A52920d36b"
+      address: "0x4afb0AaC9b862946837b2444566B8a914D6d0d97"
       abi: SimianToken
+      startBlock: 11730700
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
