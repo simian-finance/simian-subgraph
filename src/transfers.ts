@@ -23,11 +23,14 @@ export function handleTransfer(event: TransferEvent): void {
 
   transfer.from = event.params.from
   transfer.to = event.params.to
+  transfer.transferAmount = convertTokenToDecimal(event.params.value)
+  transfer.feeExcluded = false
 
   // Check if the transaction should be excluded from fees
   let exclusion = Exclusion.load(transfer.to.toHexString())
-  transfer.feeExcluded = exclusion != null
-  transfer.transferAmount = convertTokenToDecimal(event.params.value)
+  if (exclusion != null && exclusion.active) {
+    transfer.feeExcluded = true
+  }
 
   // If not excluded, calculate the original amount and fees
   if (!transfer.feeExcluded) {
