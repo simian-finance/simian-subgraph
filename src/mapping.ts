@@ -15,6 +15,7 @@ export function handleTransfer(call: TransferCall): void {
     transfer = new Transfer(id)
   }
 
+  transfer.transaction = call.transaction.hash
   transfer.blockNumber = call.block.number
   transfer.timestamp = call.block.timestamp
 

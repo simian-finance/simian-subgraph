@@ -1,6 +1,7 @@
 "Represents a token transfer between accounts"
 type Transfer @entity {
   id: ID!
+  transaction: Bytes!
   blockNumber: BigInt!
   timestamp: BigInt!
   from: Bytes!
