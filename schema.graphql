@@ -11,3 +11,9 @@ type Transfer @entity {
   feeAmount: BigDecimal!
   feeExcluded: Boolean!
 }
+
+"Represents a exclusion to fees for an account"
+type Exclusion @entity {
+  id: ID!
+  active: Boolean!
+}
