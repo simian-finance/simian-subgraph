@@ -71,4 +71,4 @@ build/
 .idea/
 
 # Graph Network codegen
-generated/
+src/types/

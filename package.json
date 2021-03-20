@@ -4,16 +4,21 @@
   "scripts": {
     "compile": "truffle compile",
     "migrate": "truffle migrate",
-    "codegen": "graph codegen",
+    "codegen": "graph codegen --output-dir src/types/",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ simian-finance/simian-subgraph",
     "create-local": "graph create --node http://localhost:8020/ simian-finance/simian-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ simian-finance/simian-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 simian-finance/simian-subgraph"
   },
-  "dependencies": {
-    "@graphprotocol/graph-cli": "0.20.0",
-    "@graphprotocol/graph-ts": "0.20.0",
-    "truffle": "^5.2.4"
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.20.0",
+    "@graphprotocol/graph-ts": "^0.20.0",
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "eslint": "^7.22.0",
+    "eslint-config-prettier": "^8.1.0",
+    "prettier": "^1.19.1",
+    "typescript": "^4.2.3"
   }
 }
