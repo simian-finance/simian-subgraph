@@ -6,10 +6,10 @@
     "migrate": "truffle migrate",
     "codegen": "graph codegen --output-dir src/types/",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ simian-finance/simian-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ simian-finance/simian-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ simian-finance/simian-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 simian-finance/simian-subgraph"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ simian-finance/simian-finance",
+    "create-local": "graph create --node http://localhost:8020/ simian-finance/simian-finance",
+    "remove-local": "graph remove --node http://localhost:8020/ simian-finance/simian-finance",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 simian-finance/simian-finance"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.20.0",
