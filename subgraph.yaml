@@ -23,4 +23,6 @@ dataSources:
       callHandlers:
         - function: transfer(address,uint256)
           handler: handleTransfer
+        - function: transferFrom(address,address,uint256)
+          handler: handleTransferFrom
       file: ./src/mapping.ts
