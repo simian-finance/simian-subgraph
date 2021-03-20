@@ -91,3 +91,8 @@ npm run deploy
 ```
 
 You should see a success message if everything goes well with a couple URLs. Keep in mind that this will be considered the `Pending Version` until it fully syncs. Once it does, it will replace the `Current Version`, as to ensure there is no lapse in data.
+
+### Related Subgraphs
+Here are a collection of subgraphs repos which can be useful as examples:
+
+- [Uniswap v2 Subgraph](https://thegraph.com/explorer/subgraph/uniswap/uniswap-v2) - [Github](https://github.com/Uniswap/uniswap-v2-subgraph/)
