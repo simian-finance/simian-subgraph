@@ -16,8 +16,8 @@ export function handleTransfer(call: TransferCall): void {
   }
 
   transfer.transaction = call.transaction.hash
-  transfer.blockNumber = call.block.number
-  transfer.timestamp = call.block.timestamp
+  transfer.blockNumber = call.block.number.toI32()
+  transfer.timestamp = call.block.timestamp.toI32()
 
   transfer.from = call.from
   transfer.to = call.inputs.recipient
