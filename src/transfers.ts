@@ -10,7 +10,7 @@ let FIVE_PERCENT = BigDecimal.fromString("0.05")
 // Handles a Transfer event from the token contract
 export function handleTransfer(event: TransferEvent): void {
   // The ID will be the transaction hash since that is likely unique to each transfer
-  const id = event.transaction.hash.toHexString()
+  let id = event.transaction.hash.toHexString()
 
   let transfer = Transfer.load(id)
   if (transfer == null) {

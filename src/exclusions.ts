@@ -4,7 +4,7 @@ import { Exclusion } from './types/schema'
 // Handles a call to the excludeAccount function on the contract
 export function handleExcludeAccount(call: ExcludeAccountCall): void {
   // The ID will be the account address being excluded
-  const id = call.inputs.account.toHexString()
+  let id = call.inputs.account.toHexString()
   let exclusion = Exclusion.load(id)
 
   // If the exclusion does not exist, create it
@@ -20,7 +20,7 @@ export function handleExcludeAccount(call: ExcludeAccountCall): void {
 // Handles a call to the includeAccount function on the contract
 export function handleIncludeAccount(call: IncludeAccountCall): void {
   // The ID will be the account address being excluded
-  const id = call.inputs.account.toHexString()
+  let id = call.inputs.account.toHexString()
   let exclusion = Exclusion.load(id)
 
   // If the exclusion does not exist, ignore this
