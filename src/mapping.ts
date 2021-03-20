@@ -1,11 +1,11 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { BigInt } from '@graphprotocol/graph-ts'
 import {
   SimianToken,
   Approval,
   OwnershipTransferred,
   Transfer
-} from "../generated/SimianToken/SimianToken"
-import { ExampleEntity } from "../generated/schema"
+} from './types/SimianToken/SimianToken'
+import { ExampleEntity } from './types/schema'
 
 export function handleApproval(event: Approval): void {
   // Entities can be loaded from the store using a string ID; this ID
