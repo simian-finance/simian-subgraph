@@ -20,9 +20,7 @@ dataSources:
       abis:
         - name: SimianToken
           file: ./abis/SimianToken.json
-      callHandlers:
-        - function: transfer(address,uint256)
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - function: transferFrom(address,address,uint256)
-          handler: handleTransferFrom
       file: ./src/mapping.ts
