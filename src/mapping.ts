@@ -4,7 +4,7 @@
 */
 
 // Re-export transfer event handlers
-export * from './transfers'
+export { handleTransfer } from './transfers'
 
 // Re-export exclude/include account handlers
-export * from './exclusions'
+export { handleExcludeAccount, handleIncludeAccount } from './exclusions'
