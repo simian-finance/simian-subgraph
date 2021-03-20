@@ -1,4 +1,4 @@
-import {BigDecimal, BigInt} from "@graphprotocol/graph-ts"
+import { BigDecimal } from "@graphprotocol/graph-ts"
 import { Transfer as TransferEvent } from './types/SimianToken/SimianToken'
 import { Transfer } from './types/schema'
 import { convertTokenToDecimal } from "./helpers"
