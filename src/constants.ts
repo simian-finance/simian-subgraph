@@ -4,7 +4,6 @@ import { BigInt, BigDecimal } from "@graphprotocol/graph-ts"
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const BURN_ADDRESS = '0x000000000000000000000000000000000000dead'
 export const CONTRACT_ADDRESS = '0x4afb0aac9b862946837b2444566b8a914d6d0d97'
-export const UNISWAP_V2_CONTRACT_ADDRESS = '0x2e571b6495a9e0cb52667a89bc7bbf77110c2802'
 
 // Number of decimals used in the Simian Token contract
 export let TOKEN_DECIMALS = BigInt.fromI32(9)
