@@ -1,5 +1,6 @@
 /**
- *Submitted for verification at Etherscan.io on 2021-01-26
+ * SPDX-License-Identifier: MIT
+ * Submitted for verification at Etherscan.io on 2021-01-26
 */
 
 pragma solidity >=0.6.0 <0.8.0;
@@ -250,8 +251,8 @@ abstract contract Ownable is Context {
 }
 
 /*
-* SPDX-License-Identifier: MIT
-*
+* This token is largely based on Reflect.finance token, except with a higher 5% rate
+* https://github.com/reflectfinance/reflect-contracts
 */
 
 pragma solidity ^0.6.2;
@@ -259,86 +260,119 @@ contract SimianToken is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
+    // Standard accounts use the reflection balances (rOwned)
+    // Excluded accounts use the token balances (tOwned)
     mapping (address => uint256) private _rOwned;
     mapping (address => uint256) private _tOwned;
+
+    // Map of spending allowances by account
     mapping (address => mapping (address => uint256)) private _allowances;
 
+    // Map of accounts which are excluded from the transaction fees and reflection
+    // Effectively, these accounts will not be charged transfer fees BUT will not receive fee redistribution either
     mapping (address => bool) private _isExcluded;
     address[] private _excluded;
 
+    // Initial token supply is 5 million
+    // Initial reflection supply is a very, very large number (but decreases as fees are collected)
+    // There is a direct mathematical relationship between 5 million supply and 5% transfer fee
     uint256 private constant MAX = ~uint256(0);
     uint256 private constant _tTotal = 5 * 10**6 * 10**9;
     uint256 private _rTotal = (MAX - (MAX % _tTotal));
     uint256 private _tFeeTotal;
 
+    // Token constants
     string private _name = 'simian.finance';
     string private _symbol = 'SIFI';
     uint8 private _decimals = 9;
 
+    // Transfer all reflective tokens to contract creator on first deploy
+    // Since the contract creator is not excluded, they use the `rOwned` balance mapping
     constructor () public {
         _rOwned[_msgSender()] = _rTotal;
         emit Transfer(address(0), _msgSender(), _tTotal);
     }
 
+    // Gets the name of the token (simian.finance)
     function name() public view returns (string memory) {
         return _name;
     }
 
+    // Gets the ticker symbol of the token (SIFI)
     function symbol() public view returns (string memory) {
         return _symbol;
     }
 
+    // Gets the maximum number of decimal places (9)
     function decimals() public view returns (uint8) {
         return _decimals;
     }
 
+    // Gets the total supply of the token (5 million)
     function totalSupply() public view override returns (uint256) {
         return _tTotal;
     }
 
+    // Gets the current balance of an account (address)
+    // If the account is a standard account, use the reflective balance (rOwned)
+    // If the account is an excluded account, use the token balance (tOwned)
     function balanceOf(address account) public view override returns (uint256) {
         if (_isExcluded[account]) return _tOwned[account];
         return tokenFromReflection(_rOwned[account]);
     }
 
+    // Transfers tokens from the sender to the recipient
+    // Any transaction fees will be applied to non-excluded accounts, and any fees reflected to holders
     function transfer(address recipient, uint256 amount) public override returns (bool) {
         _transfer(_msgSender(), recipient, amount);
         return true;
     }
 
+    // Gets the spending allowance on the behalf of another account
     function allowance(address owner, address spender) public view override returns (uint256) {
         return _allowances[owner][spender];
     }
 
+    // Approves an amount to be spent on the behalf of another account
     function approve(address spender, uint256 amount) public override returns (bool) {
         _approve(_msgSender(), spender, amount);
         return true;
     }
 
+    // Transfers tokens from one account to another on their behalf
+    // Any transaction fees will be applied to non-excluded accounts, and any fees reflected to holders
+    // This requires the sender to have approved an allowance prior to it being sent on their behalf
     function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
         _transfer(sender, recipient, amount);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
         return true;
     }
 
+    // Increases the allowance for another account to spend on behalf of the sender
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
         return true;
     }
 
+    // Decreases the allowance for another account to spend on behalf of the sender
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
         return true;
     }
 
+    // Gets whether an account is excluded from the reflection balance system
     function isExcluded(address account) public view returns (bool) {
         return _isExcluded[account];
     }
 
+    // Gets the total transfer fees that have been collected over the lifetime of the contract
     function totalFees() public view returns (uint256) {
         return _tFeeTotal;
     }
 
+    // Consumes an amount of reflection (rOwned) held by the sender, redistributing it to all holders
+    // This could be considered something like an "airdrop" or "making it rain"
+    // Since excluded accounts use the token system (tOwned) and not reflection, they cannot call this function
     function reflect(uint256 tAmount) public {
         address sender = _msgSender();
         require(!_isExcluded[sender], "Excluded addresses cannot call this function");
@@ -348,6 +382,8 @@ contract SimianToken is Context, IERC20, Ownable {
         _tFeeTotal = _tFeeTotal.add(tAmount);
     }
 
+    // Calculates the amount of equivalent reflection from a given amount of SIFI tokens (balance)
+    // This is done by determining the ratio of reflection to tokens in circulation (rSupply:tSupply)
     function reflectionFromToken(uint256 tAmount, bool deductTransferFee) public view returns(uint256) {
         require(tAmount <= _tTotal, "Amount must be less than supply");
         if (!deductTransferFee) {
@@ -359,12 +395,20 @@ contract SimianToken is Context, IERC20, Ownable {
         }
     }
 
+    // Calculates the amount of SIFI tokens from a given amount of reflection (balance)
+    // This is done by determining the ratio of reflection to tokens in circulation (rSupply:tSupply)
+    // Over time as fees are collected, the ratio decreases essentially making reflection more valuable
+    // This is the mechanism that drives the 5% redistribution from transfer fees
     function tokenFromReflection(uint256 rAmount) public view returns(uint256) {
         require(rAmount <= _rTotal, "Amount must be less than total reflections");
         uint256 currentRate =  _getRate();
         return rAmount.div(currentRate);
     }
 
+    // Sets an account to be excluded from the reflection balance system
+    // If the account has a reflection balance it will be converted into a token balance
+    // NOTE: This function can only be called by the contract owner
+    // On mainnet, ownership has been renounced (burned) and this function can never be called
     function excludeAccount(address account) external onlyOwner() {
         require(!_isExcluded[account], "Account is already excluded");
         if(_rOwned[account] > 0) {
@@ -374,8 +418,11 @@ contract SimianToken is Context, IERC20, Ownable {
         _excluded.push(account);
     }
 
+    // Sets an account as included in the reflection balance system
+    // This function can only be called by the contract owner
+    // On mainnet, ownership has been renounced (burned) and this function can never be called
     function includeAccount(address account) external onlyOwner() {
-        require(_isExcluded[account], "Account is already excluded");
+        require(_isExcluded[account], "Account is already excluded");   // This is a typo in the error message
         for (uint256 i = 0; i < _excluded.length; i++) {
             if (_excluded[i] == account) {
                 _excluded[i] = _excluded[_excluded.length - 1];
@@ -387,6 +434,7 @@ contract SimianToken is Context, IERC20, Ownable {
         }
     }
 
+    // PRIVATE: Approves allowances for another account to spend on the owner's behalf
     function _approve(address owner, address spender, uint256 amount) private {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
@@ -395,6 +443,8 @@ contract SimianToken is Context, IERC20, Ownable {
         emit Approval(owner, spender, amount);
     }
 
+    // PRIVATE: Transfers tokens from one account to another
+    // This will apply any transaction fees and updating balances (including reflection)
     function _transfer(address sender, address recipient, uint256 amount) private {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
@@ -412,6 +462,9 @@ contract SimianToken is Context, IERC20, Ownable {
         }
     }
 
+    // PRIVATE: Transfers tokens between two "standard" (non-excluded) accounts
+    // Since both accounts are standard, they both use the `rOwned` reflection balances
+    // On mainnet, this is the function that is used for nearly every transfer
     function _transferStandard(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee) = _getValues(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
@@ -420,6 +473,8 @@ contract SimianToken is Context, IERC20, Ownable {
         emit Transfer(sender, recipient, tTransferAmount);
     }
 
+    // PRIVATE: Transfers tokens from a standard account to an excluded account
+    // On mainnet, this function is rarely used as few (if any) accounts are marked as excluded
     function _transferToExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee) = _getValues(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
@@ -429,6 +484,8 @@ contract SimianToken is Context, IERC20, Ownable {
         emit Transfer(sender, recipient, tTransferAmount);
     }
 
+    // PRIVATE: Transfers tokens from an excluded account to a standard account
+    // On mainnet, this function is rarely used as few (if any) accounts are marked as excluded
     function _transferFromExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee) = _getValues(tAmount);
         _tOwned[sender] = _tOwned[sender].sub(tAmount);
@@ -438,6 +495,8 @@ contract SimianToken is Context, IERC20, Ownable {
         emit Transfer(sender, recipient, tTransferAmount);
     }
 
+    // PRIVATE: Transfers tokens between two excluded accounts
+    // On mainnet, this function is rarely used as few (if any) accounts are marked as excluded
     function _transferBothExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee) = _getValues(tAmount);
         _tOwned[sender] = _tOwned[sender].sub(tAmount);
@@ -448,11 +507,16 @@ contract SimianToken is Context, IERC20, Ownable {
         emit Transfer(sender, recipient, tTransferAmount);
     }
 
+    // Reduces the total reflection supply based on the fee collected
+    // This essentially acts as a redistribution of fees for reflection balance holders
     function _reflectFee(uint256 rFee, uint256 tFee) private {
         _rTotal = _rTotal.sub(rFee);
         _tFeeTotal = _tFeeTotal.add(tFee);
     }
 
+    // Returns a tuple containing both reflection and token transaction values
+    // The reflection values are calculated by applying the current ratio of reflection supply to token supply (rSupply:tSupply)
+    // Ex: 10000 => (1000000, 950000, 50000, 9500, 500)
     function _getValues(uint256 tAmount) private view returns (uint256, uint256, uint256, uint256, uint256) {
         (uint256 tTransferAmount, uint256 tFee) = _getTValues(tAmount);
         uint256 currentRate =  _getRate();
@@ -460,12 +524,18 @@ contract SimianToken is Context, IERC20, Ownable {
         return (rAmount, rTransferAmount, rFee, tTransferAmount, tFee);
     }
 
+    // Returns a tuple containing the token transactional values, both the net amount and fee that was deducted (5%)
+    // Ex: 10000 => (9500, 500)
     function _getTValues(uint256 tAmount) private pure returns (uint256, uint256) {
         uint256 tFee = tAmount.mul(5).div(100);
         uint256 tTransferAmount = tAmount.sub(tFee);
         return (tTransferAmount, tFee);
     }
 
+    // Returns a tuple containing the reflected values used to redistribute fees to token holders
+    // The current rate is determined by calculating the ratio of reflection to tokens in circulation (rSupply:tSupply)
+    // The rate will typically be a very high value, but decrease over time as fees are collected
+    // Ex: (10000, 500, rate = 100) => (1000000, 950000, 50000)
     function _getRValues(uint256 tAmount, uint256 tFee, uint256 currentRate) private pure returns (uint256, uint256, uint256) {
         uint256 rAmount = tAmount.mul(currentRate);
         uint256 rFee = tFee.mul(currentRate);
@@ -473,19 +543,28 @@ contract SimianToken is Context, IERC20, Ownable {
         return (rAmount, rTransferAmount, rFee);
     }
 
+    // Gets the current ratio of reflection to tokens in circulation (rSupply:tSupply)
+    // This number will start out very large and gradually get smaller as transaction fees are distributed
+    // Ex: => 56294995 (calculated from 281474975000000 / 5000000)
     function _getRate() private view returns(uint256) {
         (uint256 rSupply, uint256 tSupply) = _getCurrentSupply();
         return rSupply.div(tSupply);
     }
 
+    // Returns a tuple containing the current reflection and token supply amounts in circulation
+    // Ex: => (281474975000000, 5000000)
     function _getCurrentSupply() private view returns(uint256, uint256) {
-        uint256 rSupply = _rTotal;
-        uint256 tSupply = _tTotal;
+        // Assume initial reflection supply and token supply
+        uint256 rSupply = _rTotal;  // a huge number, gradually decreasing by fees
+        uint256 tSupply = _tTotal;  // 5000000
+
+        // Reduce supply by reflection and tokens held by excluded accounts
         for (uint256 i = 0; i < _excluded.length; i++) {
             if (_rOwned[_excluded[i]] > rSupply || _tOwned[_excluded[i]] > tSupply) return (_rTotal, _tTotal);
             rSupply = rSupply.sub(_rOwned[_excluded[i]]);
             tSupply = tSupply.sub(_tOwned[_excluded[i]]);
         }
+
         if (rSupply < _rTotal.div(_tTotal)) return (_rTotal, _tTotal);
         return (rSupply, tSupply);
     }
