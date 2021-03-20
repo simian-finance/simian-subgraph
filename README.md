@@ -83,16 +83,50 @@ graph auth https://api.thegraph.com/deploy/ <ACCESS_TOKEN>
 ```
 You should only have to do this once, or if your access token changes in the future.
 
-To deploy
-Once you have made changes and wish to deploy them to the Graph, you can use the following command:
+When you are ready to deploy them to the Graph, you can use the following command:
 
 ```
 npm run deploy
 ```
 
-You should see a success message if everything goes well with a couple URLs. Keep in mind that this will be considered the `Pending Version` until it fully syncs. Once it does, it will replace the `Current Version`, as to ensure there is no lapse in data.
+You should see a success message if everything goes well with a couple URLs.
 
-### Related Subgraphs
+Keep in mind that this will be considered the `Pending Version` until it fully syncs. Once it does, it will replace the `Current Version`, as to ensure there is no lapse in data.
+
+### Troubleshooting
+So your changes broke and now the `Pending Version` shows as failed state? How do you know what went wrong?
+
+```
+POST https://api.thegraph.com/index-node/graphql
+query {
+  indexingStatusForPendingVersion(subgraphName: "simian-finance/simian-finance") {
+    synced
+    health
+    fatalError {
+      message
+      block {
+        number
+        hash
+      }
+      handler
+    }
+    chains {
+      chainHeadBlock {
+        number
+      }
+      latestBlock {
+        number
+      }
+    }
+  }
+}
+```
+
+This will return the indexing status for the `Pending Version` of the subgraph. You can view error details in the `fatalError` property which should give you some information as to what went wrong.
+
+It will also include metadata about which block caused the error which can be useful for debugging edge cases that only happen sometimes.
+
+## Related Subgraphs
 Here are a collection of subgraphs repos which can be useful as examples:
 
 - [Uniswap v2 Subgraph](https://thegraph.com/explorer/subgraph/uniswap/uniswap-v2) - [Github](https://github.com/Uniswap/uniswap-v2-subgraph/)
