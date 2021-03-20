@@ -1,6 +1,7 @@
 import { TransferCall } from './types/SimianToken/SimianToken'
 import { Transfer } from './types/schema'
-import {BigDecimal} from "@graphprotocol/graph-ts";
+import {BigDecimal} from "@graphprotocol/graph-ts"
+import { convertTokenToDecimal } from "./helpers"
 
 const FIVE_PERCENT = BigDecimal.fromString("0.05")
 
@@ -20,7 +21,8 @@ export function handleTransfer(call: TransferCall): void {
   transfer.from = call.from
   transfer.to = call.inputs.recipient
 
-  transfer.amount = call.inputs.amount.toBigDecimal()
+  // Calculate the original amount, fee amount, and net transfer amount
+  transfer.amount = convertTokenToDecimal(call.inputs.amount)
   transfer.feeAmount = transfer.amount.times(FIVE_PERCENT)
   transfer.transferAmount = transfer.amount.minus(transfer.feeAmount)
 
