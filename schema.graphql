@@ -9,4 +9,5 @@ type Transfer @entity {
   amount: BigDecimal!
   transferAmount: BigDecimal!
   feeAmount: BigDecimal!
+  feeExcluded: Boolean!
 }
