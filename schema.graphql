@@ -1,6 +1,11 @@
-type ExampleEntity @entity {
+"Represents a token transfer between accounts"
+type Transfer @entity {
   id: ID!
-  count: BigInt!
-  owner: Bytes! # address
-  spender: Bytes! # address
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  from: Bytes!
+  to: Bytes!
+  amount: BigDecimal!
+  transferAmount: BigDecimal!
+  feeAmount: BigDecimal!
 }
