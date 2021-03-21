@@ -268,8 +268,7 @@ contract SimianToken is Context, IERC20, Ownable {
     // Map of spending allowances by account
     mapping (address => mapping (address => uint256)) private _allowances;
 
-    // Map of accounts which are excluded from the transaction fees and reflection
-    // Effectively, these accounts will not be charged transfer fees BUT will not receive fee redistribution either
+    // Map of accounts which are excluded from reflection (cannot earn the fee distribution)
     mapping (address => bool) private _isExcluded;
     address[] private _excluded;
 
@@ -340,7 +339,7 @@ contract SimianToken is Context, IERC20, Ownable {
     }
 
     // Transfers tokens from one account to another on their behalf
-    // Any transaction fees will be applied to non-excluded accounts, and any fees reflected to holders
+    // Any transaction fees will be applied and any fees reflected to holders
     // This requires the sender to have approved an allowance prior to it being sent on their behalf
     function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
         _transfer(sender, recipient, amount);
@@ -408,7 +407,7 @@ contract SimianToken is Context, IERC20, Ownable {
     // Sets an account to be excluded from the reflection balance system
     // If the account has a reflection balance it will be converted into a token balance
     // NOTE: This function can only be called by the contract owner
-    // On mainnet, ownership has been renounced (burned) and this function can never be called
+    // On mainnet, ownership has been renounced (burned) and this function can never be called again
     function excludeAccount(address account) external onlyOwner() {
         require(!_isExcluded[account], "Account is already excluded");
         if(_rOwned[account] > 0) {
@@ -420,7 +419,7 @@ contract SimianToken is Context, IERC20, Ownable {
 
     // Sets an account as included in the reflection balance system
     // This function can only be called by the contract owner
-    // On mainnet, ownership has been renounced (burned) and this function can never be called
+    // On mainnet, ownership has been renounced (burned) and this function can never be called again
     function includeAccount(address account) external onlyOwner() {
         require(_isExcluded[account], "Account is already excluded");   // This is a typo in the error message
         for (uint256 i = 0; i < _excluded.length; i++) {
@@ -463,21 +462,26 @@ contract SimianToken is Context, IERC20, Ownable {
     }
 
     // PRIVATE: Transfers tokens between two "standard" (non-excluded) accounts
-    // Since both accounts are standard, they both use the `rOwned` reflection balances
-    // On mainnet, this is the function that is used for nearly every transfer
+    // Since both accounts are standard, they both use just the `rOwned` reflection balances
     function _transferStandard(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee) = _getValues(tAmount);
+        // Subtract the reflection amount from the sender
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
+        // Add the reflection transfer amount to the recipient (minus fees)
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
     }
 
     // PRIVATE: Transfers tokens from a standard account to an excluded account
-    // On mainnet, this function is rarely used as few (if any) accounts are marked as excluded
+    // Example: You transferring to Uniswap as part of a token swap (SIFI=>ETH)
+    // Since Uniswap is excluded, they use the token balance (tOwned)
     function _transferToExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee) = _getValues(tAmount);
+        // Subtract the reflection amount from the sender
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
+        // Add the token and reflection amount to the excluded recipient
+        // Even though the recipient is excluded and does not use the reflection system, it's for affecting rSupply
         _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
         _reflectFee(rFee, tFee);
@@ -485,22 +489,31 @@ contract SimianToken is Context, IERC20, Ownable {
     }
 
     // PRIVATE: Transfers tokens from an excluded account to a standard account
-    // On mainnet, this function is rarely used as few (if any) accounts are marked as excluded
+    // Example: Uniswap transferring to you as part of a token swap (ETH=>SIFI)
+    // Since Uniswap is excluded, they use the token balance (tOwned)
     function _transferFromExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee) = _getValues(tAmount);
+        // Subtract the reflection and token amount from the excluded sender
+        // Even though the sender is excluded and does not use the reflection system, it's for affecting rSupply
         _tOwned[sender] = _tOwned[sender].sub(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
+        // Add the reflection transfer amount to the recipient (minus fess)
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
     }
 
     // PRIVATE: Transfers tokens between two excluded accounts
-    // On mainnet, this function is rarely used as few (if any) accounts are marked as excluded
+    // Example: Uniswap transferring to another DEX/CEX for liquidity
+    // Since Uniswap is the only excluded account, this never happens on mainnet
     function _transferBothExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, uint256 tFee) = _getValues(tAmount);
+        // Subtract the reflection and token amount from the excluded sender
+        // Even though the sender is excluded and does not use the reflection system, it's for affecting rSupply
         _tOwned[sender] = _tOwned[sender].sub(tAmount);
         _rOwned[sender] = _rOwned[sender].sub(rAmount);
+        // Add the reflection and token amount to the excluded recipient (minus fees)
+        // Even though the recipient is excluded and does not use the reflection system, it's for affecting rSupply
         _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
         _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
         _reflectFee(rFee, tFee);
