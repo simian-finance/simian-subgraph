@@ -1,6 +1,7 @@
-import { BigDecimal } from "@graphprotocol/graph-ts"
-import { Transfer as TransferEvent } from './types/SimianToken/SimianToken'
+import { Address, BigDecimal } from "@graphprotocol/graph-ts"
+import { SimianToken, Transfer as TransferEvent } from './types/SimianToken/SimianToken'
 import { Transfer } from './types/schema'
+import { updateRecipientAccount, updateSenderAccount } from "./accounts"
 import { convertTokenToDecimal } from "./helpers"
 
 let NINETY_FIVE_PERCENT = BigDecimal.fromString("0.95")
@@ -8,6 +9,9 @@ let FIVE_PERCENT = BigDecimal.fromString("0.05")
 
 // Handles a Transfer event from the token contract
 export function handleTransfer(event: TransferEvent) : void {
+  // Bind the contract to the address that emitted the event
+  let contract = SimianToken.bind(event.address)
+
   // The ID will be the transaction hash since that is likely unique to each transfer
   let id = event.transaction.hash.toHexString()
 
@@ -31,41 +35,7 @@ export function handleTransfer(event: TransferEvent) : void {
   transfer.feeAmount = transfer.amount.times(FIVE_PERCENT)
 
   transfer.save()
+
+  updateSenderAccount(contract, transfer.from as Address, transfer.transferAmount)
+  updateRecipientAccount(contract, transfer.to as Address, transfer.transferAmount)
 }
-
-/*function _updateSender(contract: SimianToken, transfer: Transfer) : void {
-  let senderId = transfer.from.toHexString()
-  let sender = Wallet.load(senderId)
-
-  // the sender can only send if he has received tokens before, so this should never be null (except ADDRESS_ZERO)
-  if (sender != null) {
-    // the rawBalance contains all tokens that were ever transferred to this account
-    // without taking the reflections into account
-    sender.rawBalance = sender.rawBalance.minus(transfer.amount)
-
-    // the balance is the official token balance (including reflections)
-    sender.balance = convertTokenToDecimal(contract.balanceOf(Address.fromString(senderId)))
-
-    // the earned fees are the actual balanc minus the raw transferred balance
-    sender.earnedFees = sender.balance.minus(sender.rawBalance)
-
-    sender.save()
-  }
-}
-
-function _updateReceiver(contract: SimianToken, transfer: Transfer) : void {
-  let receiverId = transfer.to.toHexString()
-  let receiver = Wallet.load(receiverId)
-
-  // if this is the first transaction, then we generate an "empty" wallet
-  if (receiver == null) {
-    receiver = new Wallet(receiverId)
-    receiver.rawBalance = DECIMAL_ZERO
-  }
-
-  receiver.rawBalance = receiver.rawBalance.plus(transfer.transferAmount)
-  receiver.balance = convertTokenToDecimal(contract.balanceOf(Address.fromString(receiverId)))
-  receiver.earnedFees = receiver.balance.minus(receiver.rawBalance)
-
-  receiver.save()
-}*/

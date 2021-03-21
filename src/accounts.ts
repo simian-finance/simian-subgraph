@@ -1,19 +1,10 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts"
-import { SimianToken, Transfer as TransferEvent } from './types/SimianToken/SimianToken'
+import { SimianToken } from './types/SimianToken/SimianToken'
 import { Account } from './types/schema'
 import { DECIMAL_ZERO } from "./constants"
 import { convertTokenToDecimal } from "./helpers"
 
-export function handleTransferForAccount(event: TransferEvent) : void {
-  // Bind the contract to the address that emitted the event
-  let contract = SimianToken.bind(event.address)
-  let transferAmount = convertTokenToDecimal(event.params.value)
-
-  updateSenderAccount(contract, event.params.from, transferAmount)
-  updateRecipientAccount(contract, event.params.to, transferAmount)
-}
-
-function updateSenderAccount(contract: SimianToken, sender: Address, transferAmount: BigDecimal) : void {
+export function updateSenderAccount(contract: SimianToken, sender: Address, transferAmount: BigDecimal) : void {
   let senderId = sender.toHexString()
   let account = Account.load(senderId)
 
@@ -33,7 +24,7 @@ function updateSenderAccount(contract: SimianToken, sender: Address, transferAmo
   account.save()
 }
 
-function updateRecipientAccount(contract: SimianToken, recipient: Address, transferAmount: BigDecimal) : void {
+export function updateRecipientAccount(contract: SimianToken, recipient: Address, transferAmount: BigDecimal) : void {
   let recipientId = recipient.toHexString()
   let account = Account.load(recipientId)
 

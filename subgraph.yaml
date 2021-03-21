@@ -23,6 +23,4 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferForAccount
       file: ./src/mapping.ts
