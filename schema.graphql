@@ -1,3 +1,11 @@
+"Represents an account holding SIFI tokens"
+type Account @entity {
+  id: ID!
+  rawBalance: BigDecimal!
+  balance: BigDecimal!
+  earnedFees: BigDecimal!
+}
+
 "Represents a token transfer between accounts"
 type Transfer @entity {
   id: ID!
@@ -9,11 +17,4 @@ type Transfer @entity {
   amount: BigDecimal!
   transferAmount: BigDecimal!
   feeAmount: BigDecimal!
-  feeExcluded: Boolean!
-}
-
-"Represents a exclusion to fees for an account"
-type Exclusion @entity {
-  id: ID!
-  active: Boolean!
 }
