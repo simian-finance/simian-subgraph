@@ -1,7 +1,7 @@
 import { Address } from '@graphprotocol/graph-ts'
 import { Contract } from './types/Contract/Contract'
 import { Token } from './types/schema'
-import { CONTRACT_ADDRESS } from "./constants"
+import { CONTRACT_ADDRESS, INT_ZERO } from "./constants"
 
 // Gets the singleton instance of the token entity
 export function getTokenInstance() : Token {
@@ -15,6 +15,8 @@ export function getTokenInstance() : Token {
     token.symbol = contract.symbol()
     token.decimals = contract.decimals()
 
+    token.totalHolders = INT_ZERO
+    token.totalTransfers = INT_ZERO
     token.save()
   }
 
