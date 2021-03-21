@@ -60,7 +60,7 @@ export function updateAccountBalances() : BigInt {
 
     // If account balance greater than zero, increment the holder count
     if (account.balance.gt(DECIMAL_ZERO)) {
-      totalHolders.plus(INT_ONE)
+      totalHolders = totalHolders.plus(INT_ONE)
     }
   })
 
