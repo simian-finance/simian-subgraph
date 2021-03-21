@@ -1,14 +1,24 @@
+"Represents the SIFI token as a singleton"
+type Token @entity {
+  id: ID!
+  name: String!
+  symbol: String!
+  decimals: Int!
+}
+
 "Represents an account holding SIFI tokens"
 type Account @entity {
   id: ID!
+  token: Token!
   rawBalance: BigDecimal!
   balance: BigDecimal!
   earnedFees: BigDecimal!
 }
 
-"Represents a token transfer between accounts"
+"Represents a token transfer between SIFI accounts"
 type Transfer @entity {
   id: ID!
+  token: Token!
   transaction: Bytes!
   blockNumber: BigInt!
   timestamp: BigInt!
