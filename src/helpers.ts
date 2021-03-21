@@ -1,4 +1,4 @@
-import {BigDecimal, BigInt} from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 let SIFI_DECIMAL_PLACES = BigDecimal.fromString("1000000000")
 

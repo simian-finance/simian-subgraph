@@ -1,8 +1,9 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts"
 import { SimianToken } from './types/SimianToken/SimianToken'
 import { Account } from './types/schema'
-import { DECIMAL_ZERO } from "./constants"
+import { getTokenInstance } from "./token"
 import { convertTokenToDecimal } from "./helpers"
+import { DECIMAL_ZERO } from "./constants"
 
 export function updateSenderAccount(contract: SimianToken, sender: Address, transferAmount: BigDecimal) : void {
   let senderId = sender.toHexString()
@@ -31,6 +32,8 @@ export function updateRecipientAccount(contract: SimianToken, recipient: Address
   // If this the first transaction for this recipient, create a new account
   if (account == null) {
     account = new Account(recipientId)
+    account.token = getTokenInstance().id
+    account.balance = DECIMAL_ZERO
     account.rawBalance = DECIMAL_ZERO
   }
 

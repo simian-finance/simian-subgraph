@@ -1,6 +1,7 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts"
 import { SimianToken, Transfer as TransferEvent } from './types/SimianToken/SimianToken'
 import { Transfer } from './types/schema'
+import { getTokenInstance } from "./token"
 import { updateRecipientAccount, updateSenderAccount } from "./accounts"
 import { convertTokenToDecimal } from "./helpers"
 
@@ -18,6 +19,7 @@ export function handleTransfer(event: TransferEvent) : void {
   let transfer = Transfer.load(id)
   if (transfer == null) {
     transfer = new Transfer(id)
+    transfer.token = getTokenInstance().id
   }
 
   // Set transaction info
