@@ -17,3 +17,11 @@ type Exclusion @entity {
   id: ID!
   active: Boolean!
 }
+
+"Represents a wallet holding SIFI tokens"
+type Wallet @entity {
+  id: ID!
+  rawBalance: BigDecimal!
+  balance: BigDecimal!
+  earnedFees: BigDecimal!
+}
