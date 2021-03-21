@@ -20,12 +20,9 @@ dataSources:
       abis:
         - name: SimianToken
           file: ./abis/SimianToken.json
-      callHandlers:
-        - function: excludeAccount(address)
-          handler: handleExcludeAccount
-        - function: includeAccount(address)
-          handler: handleIncludeAccount
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferForAccount
       file: ./src/mapping.ts

@@ -1,17 +1,13 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts"
-import { SimianToken, Transfer as TransferEvent } from './types/SimianToken/SimianToken'
-import { Transfer, Wallet } from './types/schema'
-import { DECIMAL_ZERO } from "./constants"
+import { BigDecimal } from "@graphprotocol/graph-ts"
+import { Transfer as TransferEvent } from './types/SimianToken/SimianToken'
+import { Transfer } from './types/schema'
 import { convertTokenToDecimal } from "./helpers"
 
 let NINETY_FIVE_PERCENT = BigDecimal.fromString("0.95")
 let FIVE_PERCENT = BigDecimal.fromString("0.05")
 
 // Handles a Transfer event from the token contract
-export function handleTransfer(event: TransferEvent): void {
-  // Bind the contract to the address that emitted the event
-  const contract = SimianToken.bind(event.address)
-
+export function handleTransfer(event: TransferEvent) : void {
   // The ID will be the transaction hash since that is likely unique to each transfer
   let id = event.transaction.hash.toHexString()
 
@@ -20,47 +16,26 @@ export function handleTransfer(event: TransferEvent): void {
     transfer = new Transfer(id)
   }
 
+  // Set transaction info
   transfer.transaction = event.transaction.hash
   transfer.blockNumber = event.block.number
   transfer.timestamp = event.block.timestamp
 
+  // Get sender, recipient, and transferred amount from event
   transfer.from = event.params.from
   transfer.to = event.params.to
   transfer.transferAmount = convertTokenToDecimal(event.params.value)
-  transfer.feeExcluded = false
 
-  // Check if the transaction should be excluded from fees
-  transfer.feeExcluded = contract.isExcluded(event.params.to)
-
-  // If not excluded, calculate the original amount and fees
-  // kat: TODO really? I read the contract as if the fees are always subtracted.
-  //      imo the difference to not excluded accounts is that the reflection is not applied (contract line 320)
-  if (!transfer.feeExcluded) {
-    transfer.amount = transfer.transferAmount.div(NINETY_FIVE_PERCENT)
-    transfer.feeAmount = transfer.amount.times(FIVE_PERCENT)
-  } else {
-    // Excluded from fees
-    transfer.amount = transfer.transferAmount
-    transfer.feeAmount = DECIMAL_ZERO
-  }
+  // Determine original amount and fee amount
+  transfer.amount = transfer.transferAmount.div(NINETY_FIVE_PERCENT)
+  transfer.feeAmount = transfer.amount.times(FIVE_PERCENT)
 
   transfer.save()
-
-  // now updating the wallets (sender and receiver) of this transfer
-  _updateWallets(contract, transfer as Transfer)
 }
 
-function _updateWallets(contract: SimianToken, transfer: Transfer): void {
-
-  _updateSender(transfer, contract)
-  _updateReceiver(transfer, contract)
-
-}
-
-function _updateSender(transfer: Transfer, contract: SimianToken): void {
-  const senderId = transfer.from.toHexString()
-
-  const sender = Wallet.load(senderId)
+/*function _updateSender(contract: SimianToken, transfer: Transfer) : void {
+  let senderId = transfer.from.toHexString()
+  let sender = Wallet.load(senderId)
 
   // the sender can only send if he has received tokens before, so this should never be null (except ADDRESS_ZERO)
   if (sender != null) {
@@ -76,12 +51,10 @@ function _updateSender(transfer: Transfer, contract: SimianToken): void {
 
     sender.save()
   }
-
 }
 
-function _updateReceiver(transfer: Transfer, contract: SimianToken): void {
-  const receiverId = transfer.to.toHexString()
-
+function _updateReceiver(contract: SimianToken, transfer: Transfer) : void {
+  let receiverId = transfer.to.toHexString()
   let receiver = Wallet.load(receiverId)
 
   // if this is the first transaction, then we generate an "empty" wallet
@@ -89,9 +62,10 @@ function _updateReceiver(transfer: Transfer, contract: SimianToken): void {
     receiver = new Wallet(receiverId)
     receiver.rawBalance = DECIMAL_ZERO
   }
+
   receiver.rawBalance = receiver.rawBalance.plus(transfer.transferAmount)
   receiver.balance = convertTokenToDecimal(contract.balanceOf(Address.fromString(receiverId)))
   receiver.earnedFees = receiver.balance.minus(receiver.rawBalance)
 
   receiver.save()
-}
+}*/
