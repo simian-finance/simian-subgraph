@@ -1,5 +1,5 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts"
-import { SimianToken, Transfer as TransferEvent } from './types/SimianToken/SimianToken'
+import { Contract, Transfer as TransferEvent } from './types/Contract/Contract'
 import { Transfer } from './types/schema'
 import { getTokenInstance } from "./token"
 import { updateRecipientAccount, updateSenderAccount } from "./accounts"
@@ -11,7 +11,7 @@ let FIVE_PERCENT = BigDecimal.fromString("0.05")
 // Handles a Transfer event from the token contract
 export function handleTransfer(event: TransferEvent) : void {
   // Bind the contract to the address that emitted the event
-  let contract = SimianToken.bind(event.address)
+  let contract = Contract.bind(event.address)
 
   // The ID will be the transaction hash since that is likely unique to each transfer
   let id = event.transaction.hash.toHexString()

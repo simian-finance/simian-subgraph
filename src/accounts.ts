@@ -1,11 +1,10 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts"
-import { SimianToken } from './types/SimianToken/SimianToken'
+import { Contract } from './types/Contract/Contract'
 import { Account } from './types/schema'
 import { getTokenInstance } from "./token"
 import { convertTokenToDecimal } from "./helpers"
-import { DECIMAL_ZERO } from "./constants"
 
-export function updateSenderAccount(contract: SimianToken, sender: Address, transferAmount: BigDecimal) : void {
+export function updateSenderAccount(contract: Contract, sender: Address, transferAmount: BigDecimal) : void {
   let senderId = sender.toHexString()
   let account = Account.load(senderId)
 
@@ -15,17 +14,12 @@ export function updateSenderAccount(contract: SimianToken, sender: Address, tran
     return
   }
 
-  // Raw balance includes all the sent/received tokens
-  account.rawBalance = account.rawBalance.minus(transferAmount)
-  // Balance is the official token balance (including reflection)
+  // Update the sender's balance
   account.balance = convertTokenToDecimal(contract.balanceOf(sender))
-  // Earned fees are the actual balance minus the raw balance
-  account.earnedFees = account.balance.minus(account.rawBalance)
-
   account.save()
 }
 
-export function updateRecipientAccount(contract: SimianToken, recipient: Address, transferAmount: BigDecimal) : void {
+export function updateRecipientAccount(contract: Contract, recipient: Address, transferAmount: BigDecimal) : void {
   let recipientId = recipient.toHexString()
   let account = Account.load(recipientId)
 
@@ -33,16 +27,9 @@ export function updateRecipientAccount(contract: SimianToken, recipient: Address
   if (account == null) {
     account = new Account(recipientId)
     account.token = getTokenInstance().id
-    account.balance = DECIMAL_ZERO
-    account.rawBalance = DECIMAL_ZERO
   }
 
-  // Raw balance includes all the sent/received tokens
-  account.rawBalance = account.rawBalance.plus(transferAmount)
-  // Balance is the official token balance (including reflection)
+  // Update the recipient's balance
   account.balance = convertTokenToDecimal(contract.balanceOf(recipient))
-  // Earned fees are the actual balance minus the raw balance
-  account.earnedFees = account.balance.minus(account.rawBalance)
-
   account.save()
 }

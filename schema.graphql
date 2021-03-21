@@ -12,9 +12,7 @@ type Token @entity {
 type Account @entity {
   id: ID!
   token: Token!
-  rawBalance: BigDecimal!
   balance: BigDecimal!
-  earnedFees: BigDecimal!
 }
 
 "Represents a token transfer between SIFI accounts"
