@@ -55,4 +55,5 @@ export function handleBlock(block: ethereum.Block): void {
   recordHolderHourlyData(token, block)
   recordHolderDailyData(token, block)
   recordHolderWeeklyData(token, block)
+  recordHolderMonthlyData(token, block)
 }
