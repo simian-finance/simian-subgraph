@@ -25,7 +25,4 @@ dataSources:
           handler: handleTransfer
       blockHandlers:
         - handler: handleBlock
-        - handler: handleBlockWithCallToContract
-          filter:
-            kind: call
       file: ./src/mapping.ts

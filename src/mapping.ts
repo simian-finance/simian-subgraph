@@ -6,4 +6,4 @@
  // Re-export transfer event handlers for tracking transfers
 export { handleTransfer } from './transfers'
 
-export { handleBlock, handleBlockWithContractCall } from './block'
+export { handleBlock } from './block'
