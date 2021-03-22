@@ -6,7 +6,7 @@ import { updateRecipientAccount, updateSenderAccount } from "./accounts"
 import { convertTokenToDecimal } from "./helpers"
 import { BURN_ADDRESS, CONTRACT_ADDRESS, DECIMAL_ZERO, INT_ONE } from "./constants"
 
-// Handles a Transfer event on the contract
+/* Gets called every time a Transfer event is emitted from the contract */
 export function handleTransfer(event: TransferEvent): void {
   let token = getTokenInstance()
   let contract = Contract.bind(Address.fromString(CONTRACT_ADDRESS))
@@ -34,22 +34,19 @@ export function handleTransfer(event: TransferEvent): void {
     token.totalHolders = token.totalHolders.plus(INT_ONE)
   }
 
+  // If recipient is the burn address, update the burn/supply counts
+  if (transfer.to.toHexString() == BURN_ADDRESS) {
+    token.totalBurned = token.totalBurned.plus(transferAmount)
+    token.remainingSupply = token.totalSupply.minus(token.totalBurned)
+  }
+
+  // Update total fees accumulated from contract
+  token.totalFees = convertTokenToDecimal(contract.totalFees())
   token.save()
 }
 
+/* Gets called every block */
 export function handleBlock(block: ethereum.Block): void {
-  let token = getTokenInstance()
-  let contract = Contract.bind(Address.fromString(CONTRACT_ADDRESS))
-
-  // Get the amount burned
-  let burnAddress = Address.fromString(BURN_ADDRESS)
-  let totalBurned = convertTokenToDecimal(contract.balanceOf(burnAddress))
-
-  // Determine remaining supply from burned
-  token.totalBurned = totalBurned
-  token.remainingSupply = token.totalSupply.minus(totalBurned)
-
-  // Update total fees
-  token.totalFees = convertTokenToDecimal(contract.totalFees())
-  token.save()
+  // let token = getTokenInstance()
+  // let contract = Contract.bind(Address.fromString(CONTRACT_ADDRESS))
 }
