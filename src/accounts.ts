@@ -39,9 +39,11 @@ export function updateRecipientAccount(contract: Contract, recipient: Address, t
     account = new Account(recipientId)
     account.token = token.id
 
-    // Increment the total number of holders
-    token.totalHolders = token.totalHolders.plus(INT_ONE)
-    token.save()
+    // Increment the total number of holders (if received more than zero tokens)
+    if (transferAmount.gt(DECIMAL_ZERO)) {
+      token.totalHolders = token.totalHolders.plus(INT_ONE)
+      token.save()
+    }
   }
 
   // Update the recipient's balance
