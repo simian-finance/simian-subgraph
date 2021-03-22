@@ -16,7 +16,7 @@ export function getTokenInstance() : Token {
     token.symbol = contract.symbol()
     token.decimals = contract.decimals()
 
-    token.totalSupply = contract.totalSupply().toBigDecimal()
+    token.totalSupply = convertTokenToDecimal(contract.totalSupply())
     token.totalBurned = DECIMAL_ZERO
     token.remainingSupply = token.totalSupply
 
