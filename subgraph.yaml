@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: SimianToken
+    name: Contract
     network: mainnet
     source:
       address: "0x4afb0AaC9b862946837b2444566B8a914D6d0d97"
-      abi: SimianToken
+      abi: Contract
       startBlock: 11730700
     mapping:
       kind: ethereum/events
@@ -18,9 +18,14 @@ dataSources:
       entities:
         - Transfer
       abis:
-        - name: SimianToken
-          file: ./abis/SimianToken.json
+        - name: Contract
+          file: ./abis/Contract.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+      blockHandlers:
+        - handler: handleBlock
+        - handler: handleBlockWithCallToContract
+          filter:
+            kind: call
       file: ./src/mapping.ts
