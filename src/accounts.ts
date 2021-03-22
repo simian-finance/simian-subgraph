@@ -1,77 +1,51 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts"
 import { Contract } from './types/Contract/Contract'
 import { Account } from './types/schema'
-import { getTokenInstance } from "./token"
 import { convertTokenToDecimal } from "./helpers"
-import { DECIMAL_ZERO, INT_ONE } from "./constants"
+import { DECIMAL_ZERO } from "./constants"
 
-export function updateSenderAccount(contract: Contract, sender: Address, transferAmount: BigDecimal) : void {
+/* Updates the sender account and returns whether it reached a zero balance */
+export function updateSenderAccount(contract: Contract, sender: Address, transferAmount: BigDecimal): boolean {
   let senderId = sender.toHexString()
   let account = Account.load(senderId)
 
   // The sender account can only send if they have received tokens, so this should never be null
   // Only case is ADDRESS_ZERO, which we can safely ignore
   if (account == null) {
-    return
+    return false
   }
 
-  // Update the sender's balance
+  // Update the raw balance, which is the amount of tokens purely from transfers (in/out)
+  account.rawBalance = account.rawBalance.minus(transferAmount)
+
+  // Update the actual balance from the contract (including reflection)
   account.balance = convertTokenToDecimal(contract.balanceOf(sender))
   account.save()
 
-  // If account balance has reached zero, decrement holder count
-  if (account.balance.le(DECIMAL_ZERO)) {
-    let token = getTokenInstance()
-    token.totalHolders = token.totalHolders.minus(INT_ONE)
-    token.save()
-  }
+  return account.balance.le(DECIMAL_ZERO)
 }
 
-export function updateRecipientAccount(contract: Contract, recipient: Address, transferAmount: BigDecimal) : void {
+/* Updates the recipients account and returns whether it is a new holder */
+export function updateRecipientAccount(contract: Contract, recipient: Address, transferAmount: BigDecimal): boolean {
   let recipientId = recipient.toHexString()
   let account = Account.load(recipientId)
 
-  // If this the first transaction for this recipient, create a new account
+  // If this the first transfer for this recipient, create a new account
   if (account == null) {
-    let token = getTokenInstance()
-
-    // Create the empty account
     account = new Account(recipientId)
-    account.token = token.id
-
-    // Increment the total number of holders (if received more than zero tokens)
-    if (transferAmount.gt(DECIMAL_ZERO)) {
-      token.totalHolders = token.totalHolders.plus(INT_ONE)
-      token.save()
-    }
+    account.rawBalance = DECIMAL_ZERO
+    account.balance = DECIMAL_ZERO
   }
 
-  // Update the recipient's balance
+  let previousBalance = account.balance
+
+  // Update the raw balance, which is the amount of tokens purely from transfers (in/out)
+  account.rawBalance = account.rawBalance.plus(transferAmount)
+
+  // Update the actual balance from the contract (including reflection)
   account.balance = convertTokenToDecimal(contract.balanceOf(recipient))
   account.save()
-}
 
-export function updateAccountBalances() : void {
-  let token = getTokenInstance()
-
-  token.accounts.forEach((accountId) => {
-    let address = Address.fromString(accountId)
-    let contract = Contract.bind(address)
-
-    // Determine account balance from contract
-    let currentBalance = convertTokenToDecimal(contract.balanceOf(address))
-
-    // If the account balance is zero, skip this account
-    // This is to avoid fetching and updating empty accounts (they are not earning fees)
-    if (currentBalance.le(DECIMAL_ZERO)) {
-      return
-    }
-
-    // Update the account balance and save the account
-    let account = Account.load(accountId)
-    if (account != null) {
-      account.balance = currentBalance
-      account.save()
-    }
-  })
+  // Return whether the account is new holder or not
+  return previousBalance.le(DECIMAL_ZERO) && account.balance.gt(DECIMAL_ZERO)
 }

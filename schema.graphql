@@ -9,8 +9,6 @@ type Token @entity {
   totalBurned: BigDecimal!
   remainingSupply: BigDecimal!
 
-  accounts: [Account!]! @derivedFrom(field: "token")
-  transfers: [Transfer!]! @derivedFrom(field: "token")
   totalHolders: BigInt!
   totalTransfers: BigInt!
   totalFees: BigDecimal!
@@ -19,16 +17,16 @@ type Token @entity {
 "Represents an account holding SIFI tokens"
 type Account @entity {
   id: ID!
-  token: Token!
+  rawBalance: BigDecimal!
   balance: BigDecimal!
 }
 
 "Represents a token transfer between SIFI accounts"
 type Transfer @entity {
   id: ID!
-  token: Token!
   transaction: Bytes!
   blockNumber: BigInt!
+  blockHash: Bytes!
   timestamp: BigInt!
   from: Bytes!
   to: Bytes!
