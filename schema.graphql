@@ -34,3 +34,47 @@ type Transfer @entity {
   transferAmount: BigDecimal!
   feeAmount: BigDecimal!
 }
+
+"Represents a historic count of holders for each hour"
+type HolderHourlyData @entity {
+  id: ID!
+  timestamp: Int!
+  startBlockNumber: BigInt!
+  startCount: BigInt!
+  endCount: BigInt!
+  minCount: BigInt!
+  peakCount: BigInt!
+}
+
+"Represents a historic count of holders for each day"
+type HolderDailyData @entity {
+  id: ID!
+  timestamp: Int!
+  startBlockNumber: BigInt!
+  startCount: BigInt!
+  endCount: BigInt!
+  minCount: BigInt!
+  peakCount: BigInt!
+}
+
+"Represents a historic count of holders for each week"
+type HolderWeeklyData @entity {
+  id: ID!
+  timestamp: Int!
+  startBlockNumber: BigInt!
+  startCount: BigInt!
+  endCount: BigInt!
+  minCount: BigInt!
+  peakCount: BigInt!
+}
+
+"Represents a historic count of holders for each month"
+type HolderMonthlyData @entity {
+  id: ID!
+  timestamp: Int!
+  startBlockNumber: BigInt!
+  startCount: BigInt!
+  endCount: BigInt!
+  minCount: BigInt!
+  peakCount: BigInt!
+}

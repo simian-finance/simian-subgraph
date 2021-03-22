@@ -3,6 +3,7 @@ import { Contract, Transfer as TransferEvent } from './types/Contract/Contract'
 import { getTokenInstance } from "./token"
 import { recordTransfer } from "./transfers"
 import { updateRecipientAccount, updateSenderAccount } from "./accounts"
+import { recordHolderHourlyData, recordHolderDailyData, recordHolderWeeklyData, recordHolderMonthlyData } from "./holders"
 import { convertTokenToDecimal } from "./helpers"
 import { BURN_ADDRESS, CONTRACT_ADDRESS, DECIMAL_ZERO, INT_ONE } from "./constants"
 
@@ -47,6 +48,11 @@ export function handleTransfer(event: TransferEvent): void {
 
 /* Gets called every block */
 export function handleBlock(block: ethereum.Block): void {
-  // let token = getTokenInstance()
+  let token = getTokenInstance()
   // let contract = Contract.bind(Address.fromString(CONTRACT_ADDRESS))
+
+  // Record holder historic data
+  recordHolderHourlyData(token, block)
+  recordHolderDailyData(token, block)
+  recordHolderWeeklyData(token, block)
 }
