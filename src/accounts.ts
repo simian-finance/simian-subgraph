@@ -1,9 +1,9 @@
-import { Address, BigInt, BigDecimal } from "@graphprotocol/graph-ts"
+import { Address, BigDecimal } from "@graphprotocol/graph-ts"
 import { Contract } from './types/Contract/Contract'
 import { Account } from './types/schema'
 import { getTokenInstance } from "./token"
 import { convertTokenToDecimal } from "./helpers"
-import { INT_ONE, DECIMAL_ZERO } from "./constants"
+import { DECIMAL_ZERO, INT_ONE } from "./constants"
 
 export function updateSenderAccount(contract: Contract, sender: Address, transferAmount: BigDecimal) : void {
   let senderId = sender.toHexString()

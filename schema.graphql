@@ -4,10 +4,16 @@ type Token @entity {
   name: String!
   symbol: String!
   decimals: Int!
+
+  totalSupply: BigDecimal!
+  totalBurned: BigDecimal!
+  remainingSupply: BigDecimal!
+
   accounts: [Account!]! @derivedFrom(field: "token")
   transfers: [Transfer!]! @derivedFrom(field: "token")
   totalHolders: BigInt!
   totalTransfers: BigInt!
+  totalFees: BigDecimal!
 }
 
 "Represents an account holding SIFI tokens"
