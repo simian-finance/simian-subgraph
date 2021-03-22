@@ -3,7 +3,7 @@ import { Contract } from './types/Contract/Contract'
 import { Account } from './types/schema'
 import { getTokenInstance } from "./token"
 import { convertTokenToDecimal } from "./helpers"
-import { INT_ZERO, INT_ONE, DECIMAL_ZERO } from "./constants"
+import { INT_ONE, DECIMAL_ZERO } from "./constants"
 
 export function updateSenderAccount(contract: Contract, sender: Address, transferAmount: BigDecimal) : void {
   let senderId = sender.toHexString()
@@ -18,6 +18,13 @@ export function updateSenderAccount(contract: Contract, sender: Address, transfe
   // Update the sender's balance
   account.balance = convertTokenToDecimal(contract.balanceOf(sender))
   account.save()
+
+  // If account balance has reached zero, decrement holder count
+  if (account.balance.le(DECIMAL_ZERO)) {
+    let token = getTokenInstance()
+    token.totalHolders = token.totalHolders.minus(INT_ONE)
+    token.save()
+  }
 }
 
 export function updateRecipientAccount(contract: Contract, recipient: Address, transferAmount: BigDecimal) : void {
@@ -26,8 +33,15 @@ export function updateRecipientAccount(contract: Contract, recipient: Address, t
 
   // If this the first transaction for this recipient, create a new account
   if (account == null) {
+    let token = getTokenInstance()
+
+    // Create the empty account
     account = new Account(recipientId)
-    account.token = getTokenInstance().id
+    account.token = token.id
+
+    // Increment the total number of holders
+    token.totalHolders = token.totalHolders.plus(INT_ONE)
+    token.save()
   }
 
   // Update the recipient's balance
@@ -35,34 +49,27 @@ export function updateRecipientAccount(contract: Contract, recipient: Address, t
   account.save()
 }
 
-export function updateAccountBalances() : BigInt {
+export function updateAccountBalances() : void {
   let token = getTokenInstance()
 
-  var totalHolders = INT_ZERO
-
   token.accounts.forEach((accountId) => {
-    let account = Account.load(accountId)
-    if (account == null) {
-      return
-    }
-
     let address = Address.fromString(accountId)
     let contract = Contract.bind(address)
 
-    // Update account balance from contract
-    let prevBalance = account.balance
-    account.balance = convertTokenToDecimal(contract.balanceOf(address))
+    // Determine account balance from contract
+    let currentBalance = convertTokenToDecimal(contract.balanceOf(address))
 
-    // Only save account if the balance has changed
-    if (!account.balance.equals(prevBalance)) {
+    // If the account balance is zero, skip this account
+    // This is to avoid fetching and updating empty accounts (they are not earning fees)
+    if (currentBalance.le(DECIMAL_ZERO)) {
+      return
+    }
+
+    // Update the account balance and save the account
+    let account = Account.load(accountId)
+    if (account != null) {
+      account.balance = currentBalance
       account.save()
     }
-
-    // If account balance greater than zero, increment the holder count
-    if (account.balance.gt(DECIMAL_ZERO)) {
-      totalHolders = totalHolders.plus(INT_ONE)
-    }
   })
-
-  return totalHolders
 }

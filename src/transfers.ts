@@ -4,6 +4,7 @@ import { Transfer } from './types/schema'
 import { getTokenInstance } from "./token"
 import { updateRecipientAccount, updateSenderAccount } from "./accounts"
 import { convertTokenToDecimal } from "./helpers"
+import { INT_ONE } from "./constants"
 
 let NINETY_FIVE_PERCENT = BigDecimal.fromString("0.95")
 let FIVE_PERCENT = BigDecimal.fromString("0.05")
@@ -18,8 +19,15 @@ export function handleTransfer(event: TransferEvent) : void {
 
   let transfer = Transfer.load(id)
   if (transfer == null) {
+    let token = getTokenInstance()
+
+    // Create new transfer
     transfer = new Transfer(id)
-    transfer.token = getTokenInstance().id
+    transfer.token = token.id
+
+    // Increment total transfer count
+    token.totalTransfers = token.totalTransfers.plus(INT_ONE)
+    token.save()
   }
 
   // Set transaction info
