@@ -1,5 +1,4 @@
-// Provides an easy re-export for these functions while keeping them in separate source files
-
+// Re-export them so we can keep them organized in separate files
 export { recordHolderHourlyData } from './holder-hourly'
 export { recordHolderDailyData } from './holder-daily'
 export { recordHolderWeeklyData } from './holder-weekly'

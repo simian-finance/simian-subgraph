@@ -14,7 +14,7 @@ export function recordHolderMonthlyData(token: Token, block: ethereum.Block): Ho
   if (monthlyData == null) {
     monthlyData = new HolderMonthlyData(id)
     monthlyData.timestamp = timestamp * ONE_MONTH_SECONDS
-    monthlyData.startBlockNumber = block.number
+    monthlyData.blockNumber = block.number
     monthlyData.startCount = token.totalHolders
     monthlyData.minCount = token.totalHolders
     monthlyData.peakCount = token.totalHolders
@@ -30,8 +30,6 @@ export function recordHolderMonthlyData(token: Token, block: ethereum.Block): Ho
     monthlyData.peakCount = token.totalHolders
   }
 
-  monthlyData.endCount = token.totalHolders
   monthlyData.save()
-
   return monthlyData as HolderMonthlyData
 }

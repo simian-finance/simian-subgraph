@@ -22,7 +22,7 @@ dataSources:
           file: ./abis/Contract.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+          handler: handleTransferEvent
       blockHandlers:
         - handler: handleBlock
       file: ./src/mapping.ts

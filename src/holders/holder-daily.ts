@@ -14,7 +14,7 @@ export function recordHolderDailyData(token: Token, block: ethereum.Block): Hold
   if (dailyData == null) {
     dailyData = new HolderDailyData(id)
     dailyData.timestamp = timestamp * ONE_DAY_SECONDS
-    dailyData.startBlockNumber = block.number
+    dailyData.blockNumber = block.number
     dailyData.startCount = token.totalHolders
     dailyData.minCount = token.totalHolders
     dailyData.peakCount = token.totalHolders
@@ -30,8 +30,6 @@ export function recordHolderDailyData(token: Token, block: ethereum.Block): Hold
     dailyData.peakCount = token.totalHolders
   }
 
-  dailyData.endCount = token.totalHolders
   dailyData.save()
-
   return dailyData as HolderDailyData
 }

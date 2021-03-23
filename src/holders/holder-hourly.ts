@@ -14,7 +14,7 @@ export function recordHolderHourlyData(token: Token, block: ethereum.Block): Hol
   if (hourlyData == null) {
     hourlyData = new HolderHourlyData(id)
     hourlyData.timestamp = timestamp * ONE_HOUR_SECONDS
-    hourlyData.startBlockNumber = block.number
+    hourlyData.blockNumber = block.number
     hourlyData.startCount = token.totalHolders
     hourlyData.minCount = token.totalHolders
     hourlyData.peakCount = token.totalHolders
@@ -30,8 +30,6 @@ export function recordHolderHourlyData(token: Token, block: ethereum.Block): Hol
     hourlyData.peakCount = token.totalHolders
   }
 
-  hourlyData.endCount = token.totalHolders
   hourlyData.save()
-
   return hourlyData as HolderHourlyData
 }

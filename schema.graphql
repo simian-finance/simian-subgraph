@@ -27,7 +27,7 @@ type Transfer @entity {
   transaction: Bytes!
   blockNumber: BigInt!
   blockHash: Bytes!
-  timestamp: BigInt!
+  timestamp: Int!
   from: Bytes!
   to: Bytes!
   amount: BigDecimal!
@@ -39,9 +39,8 @@ type Transfer @entity {
 type HolderHourlyData @entity {
   id: ID!
   timestamp: Int!
-  startBlockNumber: BigInt!
+  blockNumber: BigInt!
   startCount: BigInt!
-  endCount: BigInt!
   minCount: BigInt!
   peakCount: BigInt!
 }
@@ -50,9 +49,8 @@ type HolderHourlyData @entity {
 type HolderDailyData @entity {
   id: ID!
   timestamp: Int!
-  startBlockNumber: BigInt!
+  blockNumber: BigInt!
   startCount: BigInt!
-  endCount: BigInt!
   minCount: BigInt!
   peakCount: BigInt!
 }
@@ -61,9 +59,8 @@ type HolderDailyData @entity {
 type HolderWeeklyData @entity {
   id: ID!
   timestamp: Int!
-  startBlockNumber: BigInt!
+  blockNumber: BigInt!
   startCount: BigInt!
-  endCount: BigInt!
   minCount: BigInt!
   peakCount: BigInt!
 }
@@ -72,9 +69,60 @@ type HolderWeeklyData @entity {
 type HolderMonthlyData @entity {
   id: ID!
   timestamp: Int!
-  startBlockNumber: BigInt!
+  blockNumber: BigInt!
   startCount: BigInt!
-  endCount: BigInt!
   minCount: BigInt!
   peakCount: BigInt!
+}
+
+"Represents historic stats of transfers each hour"
+type TransferHourlyData @entity {
+  id: ID!
+  timestamp: Int!
+  blockNumber: BigInt!
+  minAmount: BigDecimal!
+  maxAmount: BigDecimal!
+  avgAmount: BigDecimal!
+  transferCount: BigInt!
+  transferVolume: BigDecimal!
+  feeVolume: BigDecimal!
+}
+
+"Represents historic stats of transfers each day"
+type TransferDailyData @entity {
+  id: ID!
+  timestamp: Int!
+  blockNumber: BigInt!
+  minAmount: BigDecimal!
+  maxAmount: BigDecimal!
+  avgAmount: BigDecimal!
+  transferCount: BigInt!
+  transferVolume: BigDecimal!
+  feeVolume: BigDecimal!
+}
+
+"Represents historic stats of transfers each week"
+type TransferWeeklyData @entity {
+  id: ID!
+  timestamp: Int!
+  blockNumber: BigInt!
+  minAmount: BigDecimal!
+  maxAmount: BigDecimal!
+  avgAmount: BigDecimal!
+  transferCount: BigInt!
+  transferVolume: BigDecimal!
+  feeVolume: BigDecimal!
+}
+
+"Represents historic stats of transfers each month"
+type TransferMonthlyData @entity {
+  id: ID!
+  timestamp: Int!
+  blockNumber: BigInt!
+  minAmount: BigDecimal!
+  maxAmount: BigDecimal!
+  avgAmount: BigDecimal!
+  transferCount: BigInt!
+  transferVolume: BigDecimal!
+  feeVolume: BigDecimal!
 }

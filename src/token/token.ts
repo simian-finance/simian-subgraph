@@ -1,8 +1,8 @@
 import { Address } from '@graphprotocol/graph-ts'
-import { Contract } from './types/Contract/Contract'
-import { Token } from './types/schema'
-import { convertTokenToDecimal } from "./helpers"
-import { CONTRACT_ADDRESS, DECIMAL_ZERO, INT_ZERO } from "./constants"
+import { Contract } from '../types/Contract/Contract'
+import { Token } from '../types/schema'
+import { convertTokenToDecimal } from "../helpers"
+import { CONTRACT_ADDRESS, DECIMAL_ZERO, INT_ZERO } from "../constants"
 
 // Gets the singleton instance of the token entity
 export function getTokenInstance() : Token {
