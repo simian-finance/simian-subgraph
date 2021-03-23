@@ -5,7 +5,7 @@ import { convertTokenToDecimal } from "../helpers"
 import { BURN_ADDRESS, CONTRACT_ADDRESS, DECIMAL_ZERO, INT_ZERO } from "../constants"
 
 // Gets the singleton instance of the token entity
-export function getTokenInstance() : Token {
+export function getTokenInstance(): Token {
   let contract = Contract.bind(Address.fromString(CONTRACT_ADDRESS))
   let token = Token.load(CONTRACT_ADDRESS)
 
@@ -30,9 +30,8 @@ export function getTokenInstance() : Token {
 }
 
 // Updates the token's supply and burn amounts
-export function updateTokenSupply(): void {
+export function updateTokenSupply(token: Token): void {
   let contract = Contract.bind(Address.fromString(CONTRACT_ADDRESS))
-  let token = getTokenInstance()
 
   // Update the remaining supply
   token.totalSupply = convertTokenToDecimal(contract.totalSupply())
