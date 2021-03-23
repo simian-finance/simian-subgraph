@@ -1,7 +1,7 @@
 import { BigDecimal } from "@graphprotocol/graph-ts"
-import { Transfer as TransferEvent } from './types/Contract/Contract'
-import { Transfer } from './types/schema'
-import { convertTokenToDecimal } from "./helpers"
+import { Transfer as TransferEvent } from '../types/Contract/Contract'
+import { Transfer } from '../types/schema'
+import { convertTokenToDecimal } from "../helpers"
 
 let NINETY_FIVE_PERCENT = BigDecimal.fromString("0.95")
 let FIVE_PERCENT = BigDecimal.fromString("0.05")
@@ -21,7 +21,7 @@ export function recordTransfer(event: TransferEvent): Transfer {
   transfer.transaction = event.transaction.hash
   transfer.blockNumber = event.block.number
   transfer.blockHash = event.block.hash
-  transfer.timestamp = event.block.timestamp
+  transfer.timestamp = event.block.timestamp.toI32()
 
   // Get the sender, recipient, and amount transferred
   transfer.from = event.params.from

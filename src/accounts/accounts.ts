@@ -1,8 +1,8 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts"
-import { Contract } from './types/Contract/Contract'
-import { Account } from './types/schema'
-import { convertTokenToDecimal } from "./helpers"
-import { DECIMAL_ZERO } from "./constants"
+import { Contract } from '../types/Contract/Contract'
+import { Account } from '../types/schema'
+import { convertTokenToDecimal } from "../helpers"
+import { DECIMAL_ZERO } from "../constants"
 
 /* Updates the sender account and returns whether it reached a zero balance */
 export function updateSenderAccount(contract: Contract, sender: Address, transferAmount: BigDecimal): boolean {

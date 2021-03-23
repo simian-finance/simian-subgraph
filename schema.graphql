@@ -27,7 +27,7 @@ type Transfer @entity {
   transaction: Bytes!
   blockNumber: BigInt!
   blockHash: Bytes!
-  timestamp: BigInt!
+  timestamp: Int!
   from: Bytes!
   to: Bytes!
   amount: BigDecimal!
