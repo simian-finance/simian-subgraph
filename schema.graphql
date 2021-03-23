@@ -87,3 +87,42 @@ type TransferHourlyData @entity {
   transferVolume: BigDecimal!
   feeVolume: BigDecimal!
 }
+
+"Represents historic stats of transfers each day"
+type TransferDailyData @entity {
+  id: ID!
+  timestamp: Int!
+  blockNumber: BigInt!
+  minAmount: BigDecimal!
+  maxAmount: BigDecimal!
+  avgAmount: BigDecimal!
+  transferCount: BigInt!
+  transferVolume: BigDecimal!
+  feeVolume: BigDecimal!
+}
+
+"Represents historic stats of transfers each week"
+type TransferWeeklyData @entity {
+  id: ID!
+  timestamp: Int!
+  blockNumber: BigInt!
+  minAmount: BigDecimal!
+  maxAmount: BigDecimal!
+  avgAmount: BigDecimal!
+  transferCount: BigInt!
+  transferVolume: BigDecimal!
+  feeVolume: BigDecimal!
+}
+
+"Represents historic stats of transfers each month"
+type TransferMonthlyData @entity {
+  id: ID!
+  timestamp: Int!
+  blockNumber: BigInt!
+  minAmount: BigDecimal!
+  maxAmount: BigDecimal!
+  avgAmount: BigDecimal!
+  transferCount: BigInt!
+  transferVolume: BigDecimal!
+  feeVolume: BigDecimal!
+}
