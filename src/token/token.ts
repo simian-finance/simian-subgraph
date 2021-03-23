@@ -2,7 +2,7 @@ import { Address } from '@graphprotocol/graph-ts'
 import { Contract } from '../types/Contract/Contract'
 import { Token } from '../types/schema'
 import { convertTokenToDecimal } from "../helpers"
-import { CONTRACT_ADDRESS, DECIMAL_ZERO, INT_ZERO } from "../constants"
+import { BURN_ADDRESS, CONTRACT_ADDRESS, DECIMAL_ZERO, INT_ZERO } from "../constants"
 
 // Gets the singleton instance of the token entity
 export function getTokenInstance() : Token {
@@ -27,4 +27,17 @@ export function getTokenInstance() : Token {
   }
 
   return token as Token
+}
+
+// Updates the token's supply and burn amounts
+export function updateTokenSupply(): void {
+  let contract = Contract.bind(Address.fromString(CONTRACT_ADDRESS))
+  let token = getTokenInstance()
+
+  // Update the remaining supply
+  token.totalSupply = convertTokenToDecimal(contract.totalSupply())
+  token.totalBurned = convertTokenToDecimal(contract.balanceOf(Address.fromString(BURN_ADDRESS)))
+  token.remainingSupply = token.totalSupply.minus(token.totalBurned)
+
+  token.save()
 }

@@ -1,6 +1,5 @@
 import { ethereum } from "@graphprotocol/graph-ts/index"
-import { getTokenInstance } from "./token"
-
+import { getTokenInstance, updateTokenSupply } from "./token"
 import {
   recordHolderDailyData,
   recordHolderHourlyData,
@@ -11,6 +10,9 @@ import {
 /* Performed on every block */
 export function handleBlock(block: ethereum.Block): void {
   let token = getTokenInstance()
+
+  // Update token supply and burned amounts
+  updateTokenSupply()
 
   // Record holder historic data
   recordHolderHourlyData(token, block)
