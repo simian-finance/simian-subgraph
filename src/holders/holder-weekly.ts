@@ -14,7 +14,7 @@ export function recordHolderWeeklyData(token: Token, block: ethereum.Block): Hol
   if (weeklyData == null) {
     weeklyData = new HolderWeeklyData(id)
     weeklyData.timestamp = timestamp * ONE_WEEK_SECONDS
-    weeklyData.startBlockNumber = block.number
+    weeklyData.blockNumber = block.number
     weeklyData.startCount = token.totalHolders
     weeklyData.minCount = token.totalHolders
     weeklyData.peakCount = token.totalHolders
@@ -30,8 +30,6 @@ export function recordHolderWeeklyData(token: Token, block: ethereum.Block): Hol
     weeklyData.peakCount = token.totalHolders
   }
 
-  weeklyData.endCount = token.totalHolders
   weeklyData.save()
-
   return weeklyData as HolderWeeklyData
 }
