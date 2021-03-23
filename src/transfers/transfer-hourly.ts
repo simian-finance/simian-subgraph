@@ -15,9 +15,9 @@ export function recordTransferHourlyData(transfer: Transfer): TransferHourlyData
     hourlyData = new TransferHourlyData(id)
     hourlyData.timestamp = timestamp * ONE_HOUR_SECONDS
     hourlyData.blockNumber = transfer.blockNumber
-    hourlyData.minAmount = DECIMAL_ZERO
-    hourlyData.maxAmount = DECIMAL_ZERO
-    hourlyData.avgAmount = DECIMAL_ZERO
+    hourlyData.minAmount = transfer.amount
+    hourlyData.maxAmount = transfer.amount
+    hourlyData.avgAmount = transfer.amount
     hourlyData.transferCount = INT_ZERO
     hourlyData.transferVolume = DECIMAL_ZERO
     hourlyData.feeVolume = DECIMAL_ZERO

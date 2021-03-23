@@ -15,9 +15,9 @@ export function recordTransferWeeklyData(transfer: Transfer): TransferWeeklyData
     weeklyData = new TransferWeeklyData(id)
     weeklyData.timestamp = timestamp * ONE_WEEK_SECONDS
     weeklyData.blockNumber = transfer.blockNumber
-    weeklyData.minAmount = DECIMAL_ZERO
-    weeklyData.maxAmount = DECIMAL_ZERO
-    weeklyData.avgAmount = DECIMAL_ZERO
+    weeklyData.minAmount = transfer.amount
+    weeklyData.maxAmount = transfer.amount
+    weeklyData.avgAmount = transfer.amount
     weeklyData.transferCount = INT_ZERO
     weeklyData.transferVolume = DECIMAL_ZERO
     weeklyData.feeVolume = DECIMAL_ZERO

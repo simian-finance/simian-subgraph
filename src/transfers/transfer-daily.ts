@@ -15,9 +15,9 @@ export function recordTransferDailyData(transfer: Transfer): TransferDailyData {
     dailyData = new TransferDailyData(id)
     dailyData.timestamp = timestamp * ONE_DAY_SECONDS
     dailyData.blockNumber = transfer.blockNumber
-    dailyData.minAmount = DECIMAL_ZERO
-    dailyData.maxAmount = DECIMAL_ZERO
-    dailyData.avgAmount = DECIMAL_ZERO
+    dailyData.minAmount = transfer.amount
+    dailyData.maxAmount = transfer.amount
+    dailyData.avgAmount = transfer.amount
     dailyData.transferCount = INT_ZERO
     dailyData.transferVolume = DECIMAL_ZERO
     dailyData.feeVolume = DECIMAL_ZERO

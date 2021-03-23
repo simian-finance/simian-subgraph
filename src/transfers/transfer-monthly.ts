@@ -15,9 +15,9 @@ export function recordTransferMonthlyData(transfer: Transfer): TransferMonthlyDa
     monthlyData = new TransferMonthlyData(id)
     monthlyData.timestamp = timestamp * ONE_MONTH_SECONDS
     monthlyData.blockNumber = transfer.blockNumber
-    monthlyData.minAmount = DECIMAL_ZERO
-    monthlyData.maxAmount = DECIMAL_ZERO
-    monthlyData.avgAmount = DECIMAL_ZERO
+    monthlyData.minAmount = transfer.amount
+    monthlyData.maxAmount = transfer.amount
+    monthlyData.avgAmount = transfer.amount
     monthlyData.transferCount = INT_ZERO
     monthlyData.transferVolume = DECIMAL_ZERO
     monthlyData.feeVolume = DECIMAL_ZERO
